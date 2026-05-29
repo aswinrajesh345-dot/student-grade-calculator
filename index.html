@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GradeCraft Pro | Student Grade Calculator</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Outfit', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            },
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out forwards',
+            'scale-in': 'scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+            'slide-in-right': 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'pulse-glow': 'pulseGlow 2.5s ease-in-out infinite',
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            scaleIn: {
+              '0%': { opacity: '0', transform: 'scale(0.9)' },
+              '100%': { opacity: '1', transform: 'scale(1)' },
+            },
+            slideInRight: {
+              '0%': { opacity: '0', transform: 'translateX(100px)' },
+              '100%': { opacity: '1', transform: 'translateX(0)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+              '50%': { opacity: '0.9', transform: 'scale(1.05)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+              '50%': { transform: 'translateY(-15px) rotate(2deg)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style type="text/css">
+    /* Glassmorphism Styles */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+    
+    .dark .glass-panel {
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(16, 185, 129, 0.2);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(16, 185, 129, 0.4);
+    }
+
+    /* Progress ring transition */
+    .progress-ring__circle {
+      transition: stroke-dashoffset 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+  </style>
+</head>
+
+<body class="h-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 overflow-x-hidden font-sans">
+  <!-- Glowing Background Orbs -->
+  <div class="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-brand-400/20 dark:bg-brand-500/10 blur-[120px] pointer-events-none -z-10 animate-float"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-teal-400/20 dark:bg-teal-500/10 blur-[130px] pointer-events-none -z-10 animate-float" style="animation-delay: -3s;"></div>
+
+  <!-- Main Container -->
+  <div class="min-h-screen flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    
+    <!-- Navbar / Header -->
+    <header class="flex justify-between items-center w-full mb-10 animate-fade-in">
+      <div class="flex items-center gap-3">
+        <!-- Logo Icon -->
+        <div class="p-2.5 bg-gradient-to-tr from-brand-500 to-teal-400 rounded-2xl shadow-lg shadow-brand-500/20 flex items-center justify-center text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84a50.58 50.58 0 00-2.658.814m-15.482 0A50.697 50.697 0 0112 11.251a50.697 50.697 0 016.742-1.104M12 7.5a.75.75 0 100-1.5.75.75 0 000 1.5z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.43 18.04a2.25 2.25 0 002.013 2.013 48.75 48.75 0 0015.114 0 2.25 2.25 0 002.013-2.013M9.75 22v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V22" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-extrabold tracking-tight font-outfit bg-gradient-to-r from-brand-600 to-teal-500 dark:from-brand-400 dark:to-teal-300 bg-clip-text text-transparent">GradeCraft <span class="font-light">Pro</span></h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Smart Performance Analytics</p>
+        </div>
+      </div>
+      
+      <!-- Theme Switcher -->
+      <button id="themeToggle" class="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-brand-500 dark:hover:text-brand-400 shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center">
+        <!-- Sun Icon -->
+        <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m2.828-9.9a5 5 0 117.071 7.071l-.707-.707M17.657 17.657l-.707-.707" />
+        </svg>
+        <!-- Moon Icon -->
+        <svg id="moonIcon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
+      
+      <!-- Left Column: Input Form (lg:col-span-5) -->
+      <section class="lg:col-span-5 w-full animate-fade-in" style="animation-delay: 0.1s;">
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-100/50 dark:shadow-none relative overflow-hidden">
+          <!-- Glass Top Highlight -->
+          <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-brand-400 via-teal-400 to-brand-500"></div>
+          
+          <div class="mb-6">
+            <h2 class="text-xl font-bold font-outfit text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-brand-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+              </svg>
+              Input Student Details
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Fill in the student's name and marks for calculations.</p>
+          </div>
+
+          <form id="gradeForm" class="space-y-5" onsubmit="event.preventDefault(); calculateGrades();">
+            
+            <!-- Student Name Input -->
+            <div class="space-y-2">
+              <label for="studentName" class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex justify-between items-center">
+                <span>Student Name</span>
+                <span class="text-xs text-slate-400 dark:text-slate-500 font-normal">Required</span>
+              </label>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="studentName" 
+                  placeholder="e.g., Alex Johnson" 
+                  class="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-medium"
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Subject Inputs Header with Quick Tools -->
+            <div class="pt-3 border-t border-slate-200/50 dark:border-slate-800/50 flex justify-between items-center">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Subject Marks (Max 100)</span>
+              <div class="flex gap-2">
+                <button type="button" onclick="loadRandomMarks()" class="text-xs text-brand-600 dark:text-brand-400 font-semibold hover:underline flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.656 48.656 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7C4.547 9.547 4.5 10.768 4.5 12s.047 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.092-1.209.138-2.43.138-3.662z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 10.5h.008v.008H9V10.5zm3 0h.008v.008H12V10.5zm3 0h.008v.008H15V10.5zm-6 3h.008v.008H9v-.008zm3 0h.008v.008H12v-.008zm3 0h.008v.008H15v-.008z" />
+                  </svg>
+                  Demo Marks
+                </button>
+                <span class="text-slate-300 dark:text-slate-800">|</span>
+                <button type="button" onclick="resetForm()" class="text-xs text-rose-500 hover:underline flex items-center gap-1">
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            <!-- Mathematics Input -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <label for="mathMark" class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                  Mathematics
+                </label>
+                <span id="mathBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Pending</span>
+              </div>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
+                  <span class="font-bold text-sm font-outfit">𝝅</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="mathMark" 
+                  min="0" 
+                  max="100" 
+                  placeholder="0 - 100" 
+                  oninput="updateSubjectStatus('math')"
+                  class="w-full pl-11 pr-12 py-3 bg-white/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-medium"
+                  required
+                >
+                <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                  <span class="text-xs text-slate-400 dark:text-slate-500">/ 100</span>
+                </div>
+              </div>
+              <!-- Realtime mini bar visualizer -->
+              <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div id="mathProgressBar" class="h-full bg-blue-500 w-0 transition-all duration-300"></div>
+              </div>
+            </div>
+
+            <!-- Physics Input -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <label for="physicsMark" class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                  Physics
+                </label>
+                <span id="physicsBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Pending</span>
+              </div>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
+                  <span class="font-bold text-sm">⚛</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="physicsMark" 
+                  min="0" 
+                  max="100" 
+                  placeholder="0 - 100" 
+                  oninput="updateSubjectStatus('physics')"
+                  class="w-full pl-11 pr-12 py-3 bg-white/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-medium"
+                  required
+                >
+                <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                  <span class="text-xs text-slate-400 dark:text-slate-500">/ 100</span>
+                </div>
+              </div>
+              <!-- Realtime mini bar visualizer -->
+              <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div id="physicsProgressBar" class="h-full bg-amber-500 w-0 transition-all duration-300"></div>
+              </div>
+            </div>
+
+            <!-- Chemistry Input -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <label for="chemistryMark" class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                  Chemistry
+                </label>
+                <span id="chemistryBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">Pending</span>
+              </div>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-500 transition-colors">
+                  <span class="font-bold text-sm">🧪</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="chemistryMark" 
+                  min="0" 
+                  max="100" 
+                  placeholder="0 - 100" 
+                  oninput="updateSubjectStatus('chemistry')"
+                  class="w-full pl-11 pr-12 py-3 bg-white/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-medium"
+                  required
+                >
+                <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                  <span class="text-xs text-slate-400 dark:text-slate-500">/ 100</span>
+                </div>
+              </div>
+              <!-- Realtime mini bar visualizer -->
+              <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div id="chemistryProgressBar" class="h-full bg-indigo-500 w-0 transition-all duration-300"></div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button 
+              type="submit" 
+              class="w-full relative group overflow-hidden bg-gradient-to-r from-brand-600 to-teal-500 hover:from-brand-500 hover:to-teal-400 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-brand-600/25 hover:shadow-brand-500/35 transition-all duration-300 transform active:scale-[0.98] mt-4 flex items-center justify-center gap-2"
+            >
+              <!-- Sparkles effect on hover -->
+              <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 animate-pulse-slow">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 7.5l3 3m0 0l3-3m-3 3v6m-9-9h.008v.008H3V7.5zm.008 6H3v.008h.008v-.008zm0 6H3V20h.008v-.008zm18-12h-.008v.008H21V7.5zm-.008 6H21v.008h.008v-.008zm0 6H21V20h.008v-.008zM7.5 3h9M7.5 21h9" />
+              </svg>
+              Calculate Results
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right Column: Results & Analytics (lg:col-span-7) -->
+      <section class="lg:col-span-7 space-y-6 w-full">
+        
+        <!-- Welcome Card (shown before calculation) -->
+        <div id="welcomeCard" class="glass-panel rounded-3xl p-8 shadow-xl shadow-slate-100/50 dark:shadow-none flex flex-col items-center justify-center text-center h-[548px] animate-scale-in">
+          <div class="w-20 h-20 rounded-2xl bg-brand-50 dark:bg-slate-900/60 border border-brand-100 dark:border-slate-800 flex items-center justify-center text-brand-500 mb-6 animate-float">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v16.5c0 .621.504 1.125 1.125 1.125h16.5c.621 0 1.125-.504 1.125-1.125V3c0-.621-.504-1.125-1.125-1.125H4.875C4.254 1.875 3.75 2.379 3.75 3z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75v6.75m3.75-3h-7.5M9 3.75h6M9 20.25h6" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-extrabold font-outfit text-slate-800 dark:text-slate-100 mb-2">Grade Analysis Engine</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md">Enter student information on the left and hit calculate to generate detailed subject analysis, grade points, and performance reports.</p>
+        </div>
+
+        <!-- Result Card (initially hidden) -->
+        <div id="resultCard" class="hidden glass-panel rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-100/50 dark:shadow-none relative overflow-hidden animate-scale-in">
+          <!-- Top Border Accent -->
+          <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-teal-400 via-brand-500 to-emerald-600"></div>
+
+          <!-- Header of Results -->
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 bg-brand-100/60 dark:bg-brand-900/30 px-3 py-1 rounded-full">Calculated Grade</span>
+              <h3 id="resultStudentName" class="text-2xl font-extrabold font-outfit text-slate-800 dark:text-slate-100 mt-2">Alex Johnson</h3>
+            </div>
+            <!-- Pass/Fail Badge -->
+            <span id="passFailBadge" class="px-4 py-1.5 rounded-2xl text-sm font-bold shadow-sm transition-all duration-300">PASS</span>
+          </div>
+
+          <!-- Main Result Metrics (Circular Progress + Core Stats) -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center py-4 border-y border-slate-200/50 dark:border-slate-800/50">
+            <!-- Circular Percentage Display (md:col-span-5) -->
+            <div class="md:col-span-5 flex flex-col items-center justify-center">
+              <div class="relative w-40 h-40 flex items-center justify-center">
+                <!-- SVG Progress Circle -->
+                <svg class="w-full h-full">
+                  <!-- Track -->
+                  <circle class="text-slate-100 dark:text-slate-800" stroke-width="12" stroke="currentColor" fill="transparent" r="70" cx="80" cy="80" />
+                  <!-- Circle Progress Indicator -->
+                  <circle id="radialProgressCircle" class="progress-ring__circle text-brand-500" stroke-width="12" stroke-linecap="round" stroke="currentColor" fill="transparent" r="70" cx="80" cy="80" stroke-dasharray="439.82" stroke-dashoffset="439.82" />
+                </svg>
+                <!-- Percentage Value Text overlay -->
+                <div class="absolute flex flex-col items-center justify-center text-center">
+                  <span id="resultPercentText" class="text-4xl font-extrabold font-outfit tracking-tighter text-slate-800 dark:text-slate-100">0%</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Average Score</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats (md:col-span-7) -->
+            <div class="md:col-span-7 space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white/40 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200/50 dark:border-slate-800/30">
+                  <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Total Marks</span>
+                  <div class="text-xl font-bold font-outfit text-slate-800 dark:text-slate-100 mt-0.5">
+                    <span id="resultTotalMarks" class="text-slate-800 dark:text-slate-100">0</span>
+                    <span class="text-sm font-semibold text-slate-400">/ 300</span>
+                  </div>
+                </div>
+                <div class="bg-white/40 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200/50 dark:border-slate-800/30">
+                  <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">GPA Scale</span>
+                  <div id="resultGPA" class="text-xl font-bold font-outfit text-slate-800 dark:text-slate-100 mt-0.5">0.0</div>
+                </div>
+              </div>
+              
+              <!-- Grade Box -->
+              <div class="bg-gradient-to-r from-brand-50 to-emerald-50 dark:from-slate-900/80 dark:to-teal-950/20 p-4 rounded-2xl border border-brand-100 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                  <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Letter Grade achieved</span>
+                  <p class="text-sm font-semibold text-slate-700 dark:text-slate-300 mt-0.5" id="gradeExplanation">Excellent performance!</p>
+                </div>
+                <div class="w-14 h-14 rounded-xl bg-brand-500 text-white flex items-center justify-center font-extrabold text-2xl shadow-md shadow-brand-500/20" id="resultGradeBadge">
+                  A+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subject Bar Chart & Breakdown -->
+          <div class="pt-5 space-y-4">
+            <h4 class="text-sm font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Subject-wise Comparison</h4>
+            
+            <div class="space-y-3.5">
+              <!-- Math Chart Bar -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-semibold">
+                  <span class="text-slate-600 dark:text-slate-300">Mathematics</span>
+                  <span id="chartMathVal" class="text-slate-800 dark:text-slate-200">0 / 100</span>
+                </div>
+                <div class="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div id="chartMathBar" class="h-full bg-blue-500 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Physics Chart Bar -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-semibold">
+                  <span class="text-slate-600 dark:text-slate-300">Physics</span>
+                  <span id="chartPhysicsVal" class="text-slate-800 dark:text-slate-200">0 / 100</span>
+                </div>
+                <div class="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div id="chartPhysicsBar" class="h-full bg-amber-500 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Chemistry Chart Bar -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-semibold">
+                  <span class="text-slate-600 dark:text-slate-300">Chemistry</span>
+                  <span id="chartChemistryVal" class="text-slate-800 dark:text-slate-200">0 / 100</span>
+                </div>
+                <div class="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div id="chartChemistryBar" class="h-full bg-indigo-500 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Advice Section -->
+          <div class="mt-6 p-4 rounded-2xl bg-white/40 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800/30 flex gap-3 items-start">
+            <span class="text-xl pt-0.5">💡</span>
+            <div>
+              <h5 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Teacher Feedback & Advice</h5>
+              <p id="adviceText" class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                Provide marks above to generate dynamic, intelligent recommendations for academic growth.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Class Performance & Historical Logs -->
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-100/50 dark:shadow-none space-y-6">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+              <h3 class="text-lg font-bold font-outfit text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-brand-500">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 12.408l1.5-1.5 3 3m6.727-10.182l-.439-.044a2.251 2.251 0 00-2.25 2.25v1.31a2.251 2.251 0 002.25 2.25h.44m-.44-6.71a2.251 2.251 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 5.25v13.5A2.25 2.25 0 006.75 21h6.75a2.25 2.25 0 002.25-2.25V14.25" />
+                </svg>
+                Calculated History
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Track calculations made during this session.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <!-- Export button -->
+              <button 
+                type="button" 
+                id="exportBtn" 
+                onclick="exportToCSV()" 
+                class="hidden text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-brand-500 dark:hover:text-brand-400 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-1.5 transition-all"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                CSV Export
+              </button>
+
+              <button 
+                type="button" 
+                id="clearLogsBtn" 
+                onclick="clearLogs()" 
+                class="hidden text-xs font-semibold text-rose-600 hover:text-rose-500 px-3.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-950/40 shadow-sm flex items-center gap-1.5 transition-all"
+              >
+                Clear History
+              </button>
+            </div>
+          </div>
+
+          <!-- Class Stats Metrics Panel (shown only when records exist) -->
+          <div id="classStatsPanel" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-2xl bg-white/40 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800/30">
+            <div class="text-center sm:text-left border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-800 pb-3 sm:pb-0 sm:pr-4">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Class Average</span>
+              <p id="classAverageScore" class="text-xl font-extrabold font-outfit text-slate-800 dark:text-slate-100 mt-0.5">0.0%</p>
+            </div>
+            <div class="text-center sm:text-left border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-800 pb-3 sm:pb-0 sm:px-4">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Pass Rate</span>
+              <p id="classPassRate" class="text-xl font-extrabold font-outfit text-slate-800 dark:text-slate-100 mt-0.5">0.0%</p>
+            </div>
+            <div class="text-center sm:text-left sm:pl-4">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Top Performer</span>
+              <p id="classTopPerformer" class="text-sm font-extrabold text-brand-600 dark:text-brand-400 truncate mt-1">None</p>
+            </div>
+          </div>
+
+          <!-- History Table/Container -->
+          <div class="overflow-hidden rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-white/30 dark:bg-slate-900/30">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-100/50 dark:bg-slate-900/80 border-b border-slate-200/60 dark:border-slate-800/60 text-slate-400 dark:text-slate-500 font-bold text-xs uppercase tracking-wider">
+                    <th class="py-3.5 px-4 font-bold">Student</th>
+                    <th class="py-3.5 px-4 font-bold text-center">Marks</th>
+                    <th class="py-3.5 px-4 font-bold text-center">Average</th>
+                    <th class="py-3.5 px-4 font-bold text-center">Grade</th>
+                    <th class="py-3.5 px-4 font-bold text-center">Status</th>
+                    <th class="py-3.5 px-4 text-center"></th>
+                  </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                  <tr id="emptyHistoryRow">
+                    <td colspan="6" class="py-10 text-center text-sm text-slate-400 dark:text-slate-500 font-medium">
+                      No calculations saved yet. Generate one above!
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Bottom Footer Info -->
+    <footer class="w-full flex flex-col sm:flex-row justify-between items-center py-6 border-t border-slate-200/50 dark:border-slate-800/50 text-xs text-slate-400 dark:text-slate-500 font-medium gap-4 animate-fade-in" style="animation-delay: 0.2s;">
+      <p>© 2026 GradeCraft Pro. All calculations adhere to official academic grade point scales.</p>
+      <div class="flex gap-4">
+        <a href="#" class="hover:text-brand-500 transition-colors">Privacy Policy</a>
+        <span>•</span>
+        <a href="#" class="hover:text-brand-500 transition-colors">Academic Guidelines</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Toast Notification Wrapper -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- JavaScript Functionality -->
+  <script>
+    // Theme Management
+    const themeToggle = document.getElementById('themeToggle');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+    
+    // Check local storage or system preference
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      sunIcon.classList.remove('hidden');
+      moonIcon.classList.add('hidden');
+    } else {
+      document.documentElement.classList.remove('dark');
+      sunIcon.classList.add('hidden');
+      moonIcon.classList.remove('hidden');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+      }
+    });
+
+    // Realtime form input visualization
+    function updateSubjectStatus(subject) {
+      const input = document.getElementById(`${subject}Mark`);
+      const val = parseInt(input.value);
+      const progressBar = document.getElementById(`${subject}ProgressBar`);
+      const badge = document.getElementById(`${subject}Badge`);
+
+      if (isNaN(val) || val === null || input.value === '') {
+        progressBar.style.width = '0%';
+        badge.innerText = 'Pending';
+        badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400';
+        return;
+      }
+
+      // Enforce bounds checks
+      if (val < 0) input.value = 0;
+      if (val > 100) input.value = 100;
+      
+      const cleanVal = Math.min(Math.max(val, 0), 100);
+      progressBar.style.width = `${cleanVal}%`;
+
+      // Status badges
+      if (cleanVal >= 40) {
+        badge.innerText = `${cleanVal} - Pass`;
+        badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30';
+      } else {
+        badge.innerText = `${cleanVal} - Fail`;
+        badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30';
+      }
+    }
+
+    // Load Demo Marks
+    function loadRandomMarks() {
+      const names = ['Ethan Carter', 'Sophia Vance', 'Liam Murphy', 'Olivia Jenkins', 'Noah Bradley', 'Ava Sterling'];
+      const currentNameInput = document.getElementById('studentName');
+      if (!currentNameInput.value) {
+        currentNameInput.value = names[Math.floor(Math.random() * names.length)];
+      }
+
+      document.getElementById('mathMark').value = Math.floor(Math.random() * 51) + 50; // 50 to 100
+      document.getElementById('physicsMark').value = Math.floor(Math.random() * 56) + 45; // 45 to 100
+      document.getElementById('chemistryMark').value = Math.floor(Math.random() * 61) + 40; // 40 to 100
+
+      updateSubjectStatus('math');
+      updateSubjectStatus('physics');
+      updateSubjectStatus('chemistry');
+      
+      showToast('Demo data loaded successfully!', 'success');
+    }
+
+    // Reset Form
+    function resetForm() {
+      document.getElementById('gradeForm').reset();
+      updateSubjectStatus('math');
+      updateSubjectStatus('physics');
+      updateSubjectStatus('chemistry');
+      showToast('Form cleared.', 'info');
+    }
+
+    // Radial Progress Logic
+    function setProgress(percent) {
+      const circle = document.getElementById('radialProgressCircle');
+      const radius = circle.r.baseVal.value;
+      const circumference = radius * 2 * Math.PI;
+      circle.style.strokeDasharray = `${circumference} ${circumference}`;
+      
+      const offset = circumference - (percent / 100) * circumference;
+      circle.style.strokeDashoffset = offset;
+    }
+
+    // Toast Notifications System
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'flex items-center gap-3 px-4.5 py-3 rounded-2xl border shadow-lg max-w-sm pointer-events-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-md animate-slide-in-right';
+      
+      let icon = '';
+      let colorClass = '';
+
+      if (type === 'success') {
+        icon = '<svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+        colorClass = 'border-emerald-100 dark:border-emerald-950/40 text-emerald-800 dark:text-emerald-200';
+      } else if (type === 'error') {
+        icon = '<svg class="w-5 h-5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+        colorClass = 'border-rose-100 dark:border-rose-950/40 text-rose-800 dark:text-rose-200';
+      } else {
+        icon = '<svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+        colorClass = 'border-slate-100 dark:border-slate-800/80 text-slate-700 dark:text-slate-200';
+      }
+
+      toast.className += ` ${colorClass}`;
+      toast.innerHTML = `
+        <div class="flex-shrink-0">${icon}</div>
+        <p class="text-xs font-semibold pr-4">${message}</p>
+        <button onclick="this.parentElement.remove()" class="ml-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      `;
+
+      container.appendChild(toast);
+      
+      // Auto dismiss after 4 seconds
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.classList.add('opacity-0', 'transition-all', 'duration-500', 'translate-y-[-10px]');
+          setTimeout(() => toast.remove(), 500);
+        }
+      }, 4000);
+    }
+
+    // Historical Records State
+    let records = [];
+
+    // Load records from LocalStorage on load
+    window.addEventListener('DOMContentLoaded', () => {
+      const stored = localStorage.getItem('gradecraft_records');
+      if (stored) {
+        try {
+          records = JSON.parse(stored);
+          renderHistoryTable();
+          updateClassStatistics();
+        } catch (e) {
+          console.error("Error loading stored records", e);
+        }
+      }
+    });
+
+    // Save records to LocalStorage
+    function saveRecords() {
+      localStorage.setItem('gradecraft_records', JSON.stringify(records));
+      updateClassStatistics();
+    }
+
+    // Grading and GPA Scales
+    function getGradeDetails(avg) {
+      if (avg >= 90) return { grade: 'A+', gpa: '4.00', feedback: 'Outstanding academic success! Demonstrates masterful understanding of concepts.', bg: 'bg-emerald-500', text: 'text-emerald-500' };
+      if (avg >= 80) return { grade: 'A', gpa: '3.75', feedback: 'Excellent effort. Solid understanding across all key subjects.', bg: 'bg-emerald-600', text: 'text-emerald-600' };
+      if (avg >= 70) return { grade: 'B', gpa: '3.00', feedback: 'Very good performance. Can achieve top results with consistent polishing.', bg: 'bg-teal-500', text: 'text-teal-500' };
+      if (avg >= 60) return { grade: 'C', gpa: '2.00', feedback: 'Good progress. Needs to consolidate core methods to score higher.', bg: 'bg-amber-500', text: 'text-amber-500' };
+      if (avg >= 50) return { grade: 'D', gpa: '1.00', feedback: 'Satisfactory performance, but lacks depth in standard problem-solving.', bg: 'bg-orange-500', text: 'text-orange-500' };
+      return { grade: 'F', gpa: '0.00', feedback: 'Fail. Academic recovery recommended. Seek additional instruction & remedial sessions.', bg: 'bg-rose-500', text: 'text-rose-500' };
+    }
+
+    // Generate Dynamic Advice based on subjects
+    function generateAdvice(math, physics, chemistry, passed, average) {
+      if (!passed) {
+        return `Average score is ${average}%. Focus on improving understanding across subjects by revising fundamental concepts and seeking practice materials.`;
+      }
+
+      // Check for weakest subject
+      const subjects = [
+        { name: 'Mathematics', score: math, advice: 'Dedicate 30 mins daily to practicing theorems and equations.' },
+        { name: 'Physics', score: physics, advice: 'Spend more time understanding the physical derivations and concepts behind formulas.' },
+        { name: 'Chemistry', score: chemistry, advice: 'Revise chemical equations, mechanism diagrams, and organic structures.' }
+      ];
+
+      // Sort ascending to find weakest
+      subjects.sort((a, b) => a.score - b.score);
+      const weakest = subjects[0];
+      const strongest = subjects[2];
+
+      if (weakest.score === strongest.score) {
+        return "Excellent balance across all subjects! Continue maintaining this consistent study routine.";
+      }
+
+      let text = `Strongest performance in ${strongest.name} (${strongest.score}/100). `;
+      text += `Your weakest area is ${weakest.name} with ${weakest.score}/100. Recommendation: ${weakest.advice}`;
+      return text;
+    }
+
+    // Calculate Action
+    function calculateGrades() {
+      const name = document.getElementById('studentName').value.trim();
+      const math = parseInt(document.getElementById('mathMark').value);
+      const physics = parseInt(document.getElementById('physicsMark').value);
+      const chemistry = parseInt(document.getElementById('chemistryMark').value);
+
+      // Final Validation
+      if (!name) {
+        showToast('Please enter a valid student name.', 'error');
+        return;
+      }
+      if (isNaN(math) || math < 0 || math > 100 || 
+          isNaN(physics) || physics < 0 || physics > 100 || 
+          isNaN(chemistry) || chemistry < 0 || chemistry > 100) {
+        showToast('Please verify all marks are between 0 and 100.', 'error');
+        return;
+      }
+
+      // Compute Stats
+      const total = math + physics + chemistry;
+      const average = parseFloat((total / 3).toFixed(1));
+      
+      // Pass requires average >= 40
+      const passed = average >= 40;
+      const details = getGradeDetails(average);
+      
+      // Update UI Result Card
+      document.getElementById('resultStudentName').innerText = name;
+      document.getElementById('resultTotalMarks').innerText = total;
+      
+      // Percentage counter animation
+      animateValue('resultPercentText', 0, Math.round(average), 600, '%');
+      setProgress(average);
+
+      document.getElementById('resultGPA').innerText = details.gpa;
+      
+      // Grade Badge Style
+      const gradeBadge = document.getElementById('resultGradeBadge');
+      gradeBadge.innerText = details.grade;
+      // Clear previous bg classes
+      gradeBadge.className = 'w-14 h-14 rounded-xl text-white flex items-center justify-center font-extrabold text-2xl shadow-md shadow-brand-500/20';
+      gradeBadge.classList.add(details.bg);
+
+      // Pass/Fail Badge
+      const passBadge = document.getElementById('passFailBadge');
+      passBadge.innerText = passed ? 'Status: Passed' : 'Status: Failed';
+      if (passed) {
+        passBadge.className = 'px-4 py-1.5 rounded-xl text-sm font-bold shadow-md bg-emerald-600 text-white border border-emerald-500 transition-all duration-300';
+      } else {
+        passBadge.className = 'px-4 py-1.5 rounded-xl text-sm font-bold shadow-md bg-rose-600 text-white border border-rose-500 transition-all duration-300';
+      }
+
+      document.getElementById('gradeExplanation').innerText = details.feedback;
+
+      // Subject bars comparison animate
+      document.getElementById('chartMathVal').innerText = `${math} / 100`;
+      document.getElementById('chartMathBar').style.width = `${math}%`;
+      
+      document.getElementById('chartPhysicsVal').innerText = `${physics} / 100`;
+      document.getElementById('chartPhysicsBar').style.width = `${physics}%`;
+      
+      document.getElementById('chartChemistryVal').innerText = `${chemistry} / 100`;
+      document.getElementById('chartChemistryBar').style.width = `${chemistry}%`;
+
+      // Advice Text
+      const advice = generateAdvice(math, physics, chemistry, passed, average);
+      document.getElementById('adviceText').innerText = advice;
+
+      // Unhide Result Card & Hide Welcome Card
+      document.getElementById('welcomeCard').classList.add('hidden');
+      document.getElementById('resultCard').classList.remove('hidden');
+
+      // Save to sessions history array
+      const newRecord = {
+        id: Date.now().toString(),
+        name,
+        math,
+        physics,
+        chemistry,
+        total,
+        average,
+        grade: details.grade,
+        passed
+      };
+
+      // Add to front of logs
+      records.unshift(newRecord);
+      saveRecords();
+      renderHistoryTable();
+
+      showToast(`Calculation successful for ${name}!`, 'success');
+    }
+
+    // Number counter animation helper
+    function animateValue(id, start, end, duration, suffix = '') {
+      const obj = document.getElementById(id);
+      if (start === end) {
+        obj.innerHTML = start + suffix;
+        return;
+      }
+      const range = end - start;
+      let current = start;
+      const increment = end > start ? 1 : -1;
+      const stepTime = Math.abs(Math.floor(duration / range));
+      const timer = setInterval(function() {
+        current += increment;
+        obj.innerHTML = current + suffix;
+        if (current == end) {
+          clearInterval(timer);
+        }
+      }, stepTime || 1);
+    }
+
+    // Render Historical log table
+    function renderHistoryTable() {
+      const tbody = document.getElementById('historyTableBody');
+      const clearBtn = document.getElementById('clearLogsBtn');
+      const exportBtn = document.getElementById('exportBtn');
+
+      if (records.length === 0) {
+        tbody.innerHTML = `
+          <tr id="emptyHistoryRow">
+            <td colspan="6" class="py-10 text-center text-sm text-slate-400 dark:text-slate-500 font-medium">
+              No calculations saved yet. Generate one above!
+            </td>
+          </tr>
+        `;
+        clearBtn.classList.add('hidden');
+        exportBtn.classList.add('hidden');
+        return;
+      }
+
+      clearBtn.classList.remove('hidden');
+      exportBtn.classList.remove('hidden');
+      tbody.innerHTML = '';
+
+      records.forEach(rec => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-200/50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-900/20 text-slate-700 dark:text-slate-300 text-xs transition-colors';
+        
+        const badgeColor = rec.passed 
+          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+          : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
+
+        tr.innerHTML = `
+          <td class="py-3.5 px-4 font-bold max-w-[120px] truncate">${rec.name}</td>
+          <td class="py-3.5 px-4 text-center">
+            <div class="flex items-center justify-center gap-1.5 font-semibold text-[10px]">
+              <span class="text-blue-500">M: ${rec.math}</span>
+              <span class="text-slate-300 dark:text-slate-800">|</span>
+              <span class="text-amber-500">P: ${rec.physics}</span>
+              <span class="text-slate-300 dark:text-slate-800">|</span>
+              <span class="text-indigo-500">C: ${rec.chemistry}</span>
+            </div>
+          </td>
+          <td class="py-3.5 px-4 text-center font-bold text-slate-800 dark:text-slate-200">${rec.average}%</td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="font-extrabold text-brand-600 dark:text-brand-400">${rec.grade}</span>
+          </td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeColor}">
+              ${rec.passed ? 'PASS' : 'FAIL'}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 text-center">
+            <button onclick="deleteRecord('${rec.id}')" class="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Delete individual record
+    function deleteRecord(id) {
+      records = records.filter(r => r.id !== id);
+      saveRecords();
+      renderHistoryTable();
+      showToast('Record deleted.', 'info');
+    }
+
+    // Clear all history logs
+    function clearLogs() {
+      if (confirm('Are you sure you want to clear all grade calculation history?')) {
+        records = [];
+        saveRecords();
+        renderHistoryTable();
+        showToast('History logs cleared.', 'info');
+      }
+    }
+
+    // Update statistics dashboard panel
+    function updateClassStatistics() {
+      const statsPanel = document.getElementById('classStatsPanel');
+      if (records.length === 0) {
+        statsPanel.classList.add('hidden');
+        return;
+      }
+
+      statsPanel.classList.remove('hidden');
+
+      // Calculations
+      let totalAvg = 0;
+      let passes = 0;
+      let topPerformer = records[0];
+
+      records.forEach(rec => {
+        totalAvg += rec.average;
+        if (rec.passed) passes++;
+        if (rec.average > topPerformer.average) {
+          topPerformer = rec;
+        }
+      });
+
+      const classAvg = (totalAvg / records.length).toFixed(1);
+      const passPercent = ((passes / records.length) * 100).toFixed(0);
+
+      document.getElementById('classAverageScore').innerText = `${classAvg}%`;
+      document.getElementById('classPassRate').innerText = `${passPercent}%`;
+      document.getElementById('classTopPerformer').innerText = `${topPerformer.name} (${topPerformer.average}%)`;
+    }
+
+    // Export history to CSV
+    function exportToCSV() {
+      if (records.length === 0) return;
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Student Name,Math (100),Physics (100),Chemistry (100),Total (300),Average (%),Grade,Status\n";
+
+      records.forEach(rec => {
+        const status = rec.passed ? "PASS" : "FAIL";
+        csvContent += `"${rec.name}",${rec.math},${rec.physics},${rec.chemistry},${rec.total},${rec.average},${rec.grade},${status}\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `gradecraft_pro_export_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      
+      link.click();
+      document.body.removeChild(link);
+      showToast('CSV downloaded successfully!', 'success');
+    }
+  </script>
+</body>
+</html>
