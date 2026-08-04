@@ -24,3 +24,19 @@ If you want to run this project on your own machine:
 2. Build the image: `docker build -t student-grade-calculator .`
 3. Run the container: `docker run -p 8080:80 student-grade-calculator`
 4. Open `http://localhost:8080` in your browser.
+
+## How to Deploy to Google Cloud Run
+To deploy this containerized application to GCP Cloud Run, follow these steps:
+
+1. **Authenticate with GCP & set your project:**
+   ```bash
+   gcloud auth login
+   gcloud config set project student-grade-calculator-12345
+   ```
+
+2. **Deploy directly from source:**
+   Cloud Run will automatically detect the `Dockerfile`, build the container, and deploy it:
+   ```bash
+   gcloud run deploy student-grade-calculator --source . --region asia-south1 --allow-unauthenticated
+   ```
+
