@@ -15,7 +15,8 @@ A simple, containerized web application that calculates student grades. This pro
 
 ## Live Demo
 Check out the live application here:
-[https://student-grade-calculator-dxg6x6dm5a-el.a.run.app](https://student-grade-calculator-dxg6x6dm5a-el.a.run.app)
+[https://aswinrajesh345-dot.github.io/student-grade-calculator/](https://aswinrajesh345-dot.github.io/student-grade-calculator/)
+
 
 ## How to Run Locally
 If you want to run this project on your own machine:
